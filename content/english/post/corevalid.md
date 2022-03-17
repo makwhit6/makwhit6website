@@ -16,7 +16,8 @@ title: Model Validation with CORE
 
 ## Data
 The original data set contained student data (ranging from 2nd - 4th grade) associated with CORE passages (referred to as forms). This data contained just shy of 15,000 student entries. Individual student data was masked and anonymized. Data was cleaned where form, grade, and year was pulled from the filepath. Average words read correctly per minute across each form categorized by grade was previously calculate and imported into the data frame. Passage data was pulled into the environment as a tibble and merged with the student data frame. 
-```
+
+```r
 corepassages <- tibble(
   path = fs::dir_ls(here::here("CORE", "passage_text")),
   form_number = str_extract(path, "(?<=text/)(.*?)(?=.txt)"),
