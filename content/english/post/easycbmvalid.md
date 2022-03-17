@@ -1,6 +1,6 @@
 ---
 author: Makayla Whitney
-date: "2022-03-03"
+date: "03/03/2022"
 description: model development process
 series:
 - series-setup
