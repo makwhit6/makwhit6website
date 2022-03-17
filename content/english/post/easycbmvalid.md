@@ -16,7 +16,7 @@ Educational researchers within the Behavioral Research and Teaching Facility (BR
 
 ## Data
 The original data set contained student data associated with easyCBM passages (referred to as forms). This data contained just over 5 million student entries. Individual student data was masked and anonymized. Data was cleaned where form, grade, and year was pulled from the filepath. 
-```
+```r
 files <- dir_ls(here::here("easyCBM", "itemdata"), recurse = TRUE, type = "file")
 
 easycbm_data <- purrr::map_df(
@@ -41,7 +41,7 @@ easycbm_data <- easycbm_data %>%
 ```
 Our model requires information regarding the correct words read per minute (WRC). To accommodate this, averages were taken across each year of data, within each form by grade. This resulted in 159 rows of data. 
 
-```
+```r
 sumdata <- easycbm_data %>%
   mutate(
     score = parse_number(score)) %>%
@@ -58,7 +58,7 @@ sds <- tapply(
   )
 ```
 Once the student data was finalized, the text data per passage was added. This created a column in the data set for the text files themselves.   
-```
+```r
 cbmpassages <- tibble(
   path = dir_ls(here::here("easyCBM", "prf_txt")),
   form = gsub(".+PRF_?(.+)_.+", "\\1", path),

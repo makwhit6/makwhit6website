@@ -1,6 +1,6 @@
 ---
 author: Makayla Whitney
-date: "2022-03-04"
+date: "2022-03-02"
 description: model development process
 series:
 - series-setup
@@ -31,7 +31,7 @@ Ridge penalty terms were added to the loss function to avoid large coefficients.
 
 ## Building the Model
 To build the model, we began by downloading the necessary packages. 
-```
+```r
 require(caret)
 require(recipes)
 require(finalfit)
@@ -39,14 +39,14 @@ require(glmnet)
 require(finalfit)
 ```
 The data set is then imported. Readability is the data set obtained from the CommonLit Readability Kaggle Competition. We set the seed to allow for reproducibility.
-```
+```r
 readability <- read.csv('https://raw.githubusercontent.com/uo-datasci-specialization/c4-ml-fall-2021/main/data/readability_features.csv',header=TRUE)
 
 set.seed(10152021)
 ```
 ### Training and Test Sets
 A crucial set in building the model is training part of the available data as the model and then testing the accuracy of the model with the other part of the data. We begin with creating a list of random numbers ranging from 1 to number of rows from the data set and put 90% of the data into the training data. The other 10% serves as our test data.  
-```
+```r
 loc      <- sample(1:nrow(readability), round(nrow(readability) * 0.9))
 read_tr  <- readability[loc, ]
 read_te  <- readability[-loc, ]
@@ -57,7 +57,7 @@ We use the [`recipe` package](https://www.rdocumentation.org/packages/recipes/ve
 
 Once these parameters were established, steps were added to the blueprint. These are similar to steps in a cooking recipe. For example, when making banana bread, you gather the ingredients and add them to a mixing bowl in a particular order. Shown below, we added our steps in an order that was ideal for our model.
 
-```
+```r
   blueprint <- recipe(x     = readability,
                       vars  = colnames(readability),
                       roles = c(rep('predictor',990),'outcome')) %>%
@@ -80,7 +80,7 @@ The table below gives a basic description of each of the steps used within this 
 ### Cross-Validation and Grid Tuning
 Cross-validation was conducted to judge the overall performance and accuracy of the model. 
 
-```
+```r
 # Cross validation settings
   
 # Randomly shuffle the data
@@ -103,14 +103,14 @@ cv <- trainControl(method = "cv",
 ```
 By optimizing the degree of ridge penalty via tuning, we can typically get models with better performance than a logistic regression with no regularization. In our case, the optimal lambda, after being tested, was determined as 0.57. This proved to tune the best grid for the model. 
 
-```
+```r
 grid <- data.frame(alpha = 0, lambda = 0.57) 
 grid
 
 ```
 The final step in building the model is to train it.
 
-```
+```r
 ridge <- caret::train(blueprint, 
                       data      = read_tr, 
                       method    = "glmnet", 

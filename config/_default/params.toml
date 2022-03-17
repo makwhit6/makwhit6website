@@ -5,7 +5,7 @@ author = "Makayla Whitney"
 description = "student, climber, ceramicist"
 profilePicture = "images/Mount Pisgah.jpg"
 keywords = ""
-favicon = "favicons/"
+favicon = "favicons/makfavicon.ico"
 # example ["css/custom.css"]
 customCss = []
 # example ["js/custom.js"]
