@@ -2,9 +2,6 @@
 author: Makayla Whitney
 date: "2022-02-03"
 description: model development process
-tags:
-- markdown
-- text
 series:
 - series-setup
 tags:
