@@ -15,7 +15,7 @@ title: Model Validation with CORE
 [Computerized Oral Reading Evaluation (CORE)](https://jnese.github.io/core-blog/about.html "Computerized Oral Reading Evaluation (CORE)") is a project led by Dr. Joe Nese housed within the Behavioral Research and Teaching Facility at the University of Oregon. This project is focused on using computerized assessment of oral reading fluency to analyze aspects of the reading process in 2nd - 4th graders. As part of this project, one of the main focuses is the connection between [prosody](https://jnese.github.io/coreprosody/ "[prosody") and oral reading practices. Students were given a passage to read with no time constraints; these passages were relatively short at no more than 5 sentences each. With the permission of researchers, this project uses CORE passages to validate the readability model developed in this project. 
 
 ## Data
-The original data set contained student data (ranging from 2nd - 4th grade) associated with CORE passages (referred to as forms). This data contained just shy of 15,000 student entries. Individual student data was masked and anonymized. Data was cleaned where form, grade, and year was pulled from the filepath. Average words read correctly per minute across each form categorized by grade was previously calculate and imported into the data frame. Passage data was pulled into the environment as a tibble and merged with the student data frame. 
+The original data set contained student data (ranging from 2nd - 4th grade) associated with CORE passages (referred to as forms). This data contained just shy of 15,000 student entries. Individual student data was masked and anonymized. Data was cleaned where form, grade, and year were pulled from the file path. Average words read correctly per minute across each form categorized by grade was previously calculated and imported into the data frame. Passage data was pulled into the environment as a tibble and merged with the student data frame. 
 
 ```r
 corepassages <- tibble(
@@ -47,7 +47,7 @@ The readability score predictions were applied to the [Bradley-Terry model](http
 
 The first time running the easyCBM data through the model and plotting the correlation between the predictions and student scores resulted in the following plot. Data has an average correlation of -0.3419986. 
 
-![CORE Readability Predictions](/Plots/corepredictions.png)
+![CORE Readability Predictions](Plots/corepredictions.png)
 
 Bradley-Terry analysis developed a range between 0 and 4 for this data set. A lower value indicates the text is more difficult to read, whereas a higher value indicates an easier text. From the plot above, it is difficult to determine if there is a correlation between passage length and overall difficulty. Typically, the longer the text, the lower the level of readability. This plot seems to display three groups of words read correctly per minute with data spread across the analysis range. This could be due to the lack of constraints on students time allotted for the assessment.Further investigation into the effects of passage length and time allotted for each student on overall readability will be conducted. 
 
