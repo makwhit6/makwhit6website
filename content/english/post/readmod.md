@@ -18,29 +18,34 @@ The term "readability" describes the level of difficulty a written passage is. F
 The readability of a passage determines how well a reader interacts with the overall content of a passage. If they are struggling to understand the basic words and structure, they will not be able to comprehend and absorb the overall story line. All readers are unique in the way that they approach a text. The impact that a text's readability and features has varies from student to student (1). It is important for teachers and literacy practitioners to have not only an understanding of their students' reading level, but the readability score of passages being presented. This score assists teachers and practitioners in providing reading assistance and resources calibrated to the individual student. 
 
 # Model Description
-The readability model featured in this series was developed in EDUC 654: Machine Learning taught by Dr. Cengiz Zopluoglu at the University of Oregon. Text features as well as the model were created with text data from the [CommonLit Readability Kaggle Competition](https://www.kaggle.com/c/commonlitreadabilityprize/ "CommonLit Readability Kaggle Competition"). In the previous post, I displayed how to gather text features to assist with predicting readability of a passage. In the following post, I will demonstrate how the readability prediction model was constructed. 
+The readability model featured in this series was developed in EDLD 654: Machine Learning taught by Dr. Cengiz Zopluoglu at the University of Oregon. Text features as well as the model were created with text data from the [CommonLit Readability Kaggle Competition](https://www.kaggle.com/c/commonlitreadabilityprize/ "CommonLit Readability Kaggle Competition"). In [a previous post](textfeats.md), I displayed how to gather text features to assist with predicting readability of a passage. In this post, I will demonstrate how the readability prediction model was constructed. 
 
 ## Ridge Line Penalty
-Performance evaluation metrics were used to evaluate which logistic regression model produced the best results. Models analyzed included logistic regression, logistic regression with ridge penalty, logistic regression with lasso penalty, and logistic regression with elastic net. Information collected from each model tested included the R-squared measurement, the Mean Absolute Error (MAE), and the Root Mean Squared Error (RMSE). Out of these four models, the model with logistic regression with ridge penalty performed the best with the following statistics:
+Performance evaluation metrics were used to evaluate which logistic regression model produced the best results. Models analyzed included logistic regression, logistic regression with a ridge penalty, logistic regression with a lasso penalty, and logistic regression with elastic net (a weighted average of ridge and lasso penalties together). Information collected from each model tested included R-squared, the Mean Absolute Error (MAE), and the Root Mean Squared Error (RMSE). The model with logistic regression with ridge penalty performed the best with the following statistics:
 
 | R-squared |     MAE   |     RMSE  |
 |-----------|-----------|-----------|
 | 0.7274006 | 0.4347177 | 0.5355444 |
 
-Ridge penalty terms were added to the loss function to avoid large coefficients. By including a ridge penalty, we reduced model variance in exchange of adding bias [Lecture 5a](https://ml-21.netlify.app/notes/lecture-5a.html#21_Ridge_Penalty "Lecture 5a").
+Ridge penalty terms were added to the loss function to avoid large coefficients. By including a ridge penalty, we reduced model variance in exchange of adding bias ([see here for more information](https://ml-21.netlify.app/notes/lecture-5a.html#21_Ridge_Penalty "Lecture 5a")).
 
 ## Building the Model
 To build the model, we began by downloading the necessary packages. 
+
 ```r
-require(caret)
-require(recipes)
-require(finalfit)
-require(glmnet)
-require(finalfit)
+library(caret)
+library(recipes)
+library(finalfit)
+library(glmnet)
+library(finalfit)
 ```
-The data set is then imported. Readability is the data set obtained from the CommonLit Readability Kaggle Competition. We set the seed to allow for reproducibility.
+The data set was then imported, which was obtained from the CommonLit Readability Kaggle Competition. We set the seed to allow for reproducibility.
+
 ```r
-readability <- read.csv('https://raw.githubusercontent.com/uo-datasci-specialization/c4-ml-fall-2021/main/data/readability_features.csv',header=TRUE)
+readability <- read.csv(
+  'https://raw.githubusercontent.com/uo-datasci-specialization/c4-ml-fall-2021/main/data/readability_features.csv',
+  header = TRUE
+)
 
 set.seed(10152021)
 ```
@@ -67,7 +72,7 @@ Once these parameters were established, steps were added to the blueprint. These
     step_normalize(all_numeric_predictors()) %>%
     step_corr(all_numeric(),threshold=0.9)
 ```
-The table below gives a basic description of each of the steps used within this blueprint. For more information and step possibilities, please visit the `recipe` package link above. Click on the links in the table to find out more about those steps. . 
+The table below gives a basic description of each of the steps used within this blueprint. For more information and step possibilities, please visit the `recipe` package link above. Click on the links in the table to find more information on each step. 
 
 |         Step        |                                       Description                                         |
 |---------------------|-------------------------------------------------------------------------------------------|
@@ -84,38 +89,40 @@ Cross-validation was conducted to judge the overall performance and accuracy of 
 # Cross validation settings
   
 # Randomly shuffle the data
-
-read_tr = read_tr[sample(nrow(read_tr)),]
+read_tr <- read_tr[sample(nrow(read_tr)),]
 
 # Create 10 folds with equal size
-
-folds = cut(seq(1,nrow(read_tr)),breaks=10,labels=FALSE)
+folds <- cut(seq(1,nrow(read_tr)),breaks=10,labels=FALSE)
   
 # Create the list for each fold 
-      
-my.indices <- vector('list',10)
-for(i in 1:10){
-  my.indices[[i]] <- which(folds!=i)
+my_indices <- vector('list', 10)
+for(i in 1:10) {
+  my_indices[[i]] <- which(folds != i)
 }
       
-cv <- trainControl(method = "cv",
-                  index  = my.indices)
+cv <- trainControl(
+  method = "cv",
+  index  = my.indices
+)
 ```
+
 By optimizing the degree of ridge penalty via tuning, we can typically get models with better performance than a logistic regression with no regularization. In our case, the optimal lambda, after being tested, was determined as 0.57. This proved to tune the best grid for the model. 
 
 ```r
 grid <- data.frame(alpha = 0, lambda = 0.57) 
 grid
-
 ```
+
 The final step in building the model is to train it.
 
 ```r
-ridge <- caret::train(blueprint, 
-                      data      = read_tr, 
-                      method    = "glmnet", 
-                      trControl = cv,
-                      tuneGrid  = grid)
+ridge <- caret::train(
+  blueprint, 
+  data      = read_tr, 
+  method    = "glmnet", 
+  trControl = cv,
+  tuneGrid  = grid
+)
 ```
 Please move on to the next post in this series **Model Validation with easyCBM** to read about validating the model developed here with a set of text and accompanying student data.For more information regarding logistic regression, refer to Dr. Zopluoglu's lectures [Regularization in Linear Regression](https://ml-21.netlify.app/notes/lecture-4b.html#Regularization "Regularization in Linear Regression") and [Logistic Regression and Regularization](https://ml-21.netlify.app/notes/lecture-5a.html#1_Overview_of_the_Logistic_Regression "Logistic Regression and Regularization").
 

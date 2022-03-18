@@ -12,12 +12,16 @@ title: Model Validation with easyCBM
 ---
 
 # easyCBM
-Educational researchers within the Behavioral Research and Teaching Facility (BRT) at the University of Oregon developed easyCBM as a tool for assessing students on their reading skills. These short assessments give teachers insight into areas of struggle for their students, what supports teachers can provide, and how effective their overall teaching is. The [easyCBM program](easycbm.com "easyCBM program") uses reading passages that have been developed based on the "Big Five" constructs reported in the 2000 National Reading Panel report. Each of these passages is specific to the grade level assigned; students are given a minute to read their assigned passage. With the permission of researchers, this project uses easyCBM passages to validate the readability model developed in this project. 
+Educational researchers within the [Behavioral Research and Teaching](https://www.brtprojects.org/) Facility (BRT) at the University of Oregon developed easyCBM as a tool for assessing students reading skills. These short assessments give teachers insight into areas of struggle for their students, what supports teachers can provide, and how effective their overall teaching is. The [easyCBM program](easycbm.com "easyCBM program") uses reading passages that have been developed based on the "Big Five" constructs reported in the 2000 National Reading Panel report. Each of these passages is specific to the grade level assigned; students are given one minute to read their assigned passage. With the permission of researchers, this project uses easyCBM passages to validate the readability model developed in this project. 
 
 ## Data
-The original data set contained student data associated with easyCBM passages (referred to as forms). This data contained just over 5 million student entries. Individual student data was masked and anonymized. Data was cleaned where form, grade, and year was pulled from the filepath. 
+The original data set contained student data associated with easyCBM passages (referred to as forms). This data contained just over 5 million student entries. Individual student data was masked and anonymized. Data was cleaned where form, grade, and year were pulled from the filepath. 
 ```r
-files <- dir_ls(here::here("easyCBM", "itemdata"), recurse = TRUE, type = "file")
+files <- dir_ls(
+  here::here("easyCBM", "itemdata"),
+  recurse = TRUE,
+  type = "file"
+)
 
 easycbm_data <- purrr::map_df(
   files,
@@ -55,9 +59,11 @@ sds <- tapply(
   list(easycbm_data$grade, easycbm_data$form),
   sd,
   na.rm = TRUE
-  )
+)
 ```
+
 Once the student data was finalized, the text data per passage was added. This created a column in the data set for the text files themselves.   
+
 ```r
 cbmpassages <- tibble(
   path = dir_ls(here::here("easyCBM", "prf_txt")),
@@ -71,7 +77,7 @@ cbmpassages %>%
   dplyr::count(grade)
 
 
-passages<- cbmpassages %>% 
+passages <- cbmpassages %>% 
   dplyr::filter(!form %in% c("18", "19", "20")) %>% 
   mutate(
     grade = as.character(grade),
@@ -80,7 +86,7 @@ passages<- cbmpassages %>%
 
 passages$text <- map_chr(passages$text, ~.x)
 
-p <- left_join(x= easycbm, y = passages, by = c("form", "grade"))
+p <- left_join(x = easycbm, y = passages, by = c("form", "grade"))
 
 d <- na.omit(p)
 
@@ -97,9 +103,9 @@ The final data frame is displayed below. The last column `readability score` was
 ## Results
 The readability score predictions were applied to the [Bradley-Terry model](https://www.r-bloggers.com/2022/02/what-is-the-bradley-terry-model/ "Bradley-Terry model"). This is a probability model used for predicting the outcome of a paired comparison. This model results in a number estimate equal to the probably that the comparison turns out to be true. In our case, this is comparisons made between easyCBM excerpts to determine their predicted readability. According to the owner of the readability data set from the original Kaggle competition ([Scott Crossley](https://www.kaggle.com/c/commonlitreadabilityprize/discussion/240423 "Scott Crossley")), the readability score is a result of a Bradley-Terry analysis of over 111,000 pairwise comparisons between excerpts. 
 
-The first time running the easyCBM data through the model and plotting the correlation between the predictions and student scores resulted in the discovery of an outlier. This outlier was form 7 from grade 3; the average WRC was 431.04619 across students, which is over 200 points higher than the rest of the forms. Removing this outlier resulted in the below plot with an average correlation of -0.5569613. 
+The first time running the easyCBM data through the model and plotting the correlation between the predictions and student scores resulted in the discovery of an outlier. This outlier was form 7 from grade 3; the average WRC was 431.05 across students, which was over 200 points higher than the rest of the forms. Removing this outlier resulted in the below plot with an average correlation of -0.56. 
 
-![easyCBM Readability Predictions](/Plots/readprediction.png)
+![easyCBM Readability Predictions](Plots/readprediction.png)
 
 Bradley-Terry analysis developed a range between -2 and 1 for this data set. A lower value indicates the text is more difficult to read, whereas a higher value indicates an easier text. From the plot above, it is evident that the more words read correctly per minute on average, the more difficult the text was to read. The downward slope indicates that as less words are read, the easier the passage readability overall. This observation may be congruent with passage length in general. A longer passage in theory will be more difficult. Further investigation into the effects of passage length on overall readability will be conducted. 
 
